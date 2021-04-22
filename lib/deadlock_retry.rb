@@ -12,13 +12,13 @@ module DeadlockRetry
   MAXIMUM_RETRIES_ON_DEADLOCK = 3
 
 
-  def transaction(*objects, &block)
+  def transaction(**options, &block)
     retry_count = 0
 
     check_innodb_status_available
 
     begin
-      super(*objects, &block)
+      super(**options, &block)
     rescue ActiveRecord::StatementInvalid => error
       raise if in_nested_transaction?
       if DEADLOCK_ERROR_MESSAGES.any? { |msg| error.message =~ /#{Regexp.escape(msg)}/ }
